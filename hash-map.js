@@ -1,6 +1,14 @@
+import { LinkedList } from "../linked-list/linked-list.js";
+
+export { HashMap };
+
+
+// Array.from({ length: capacity }, (v, i) => linked list); to create buckets
+
 class HashMap {
 	constructor() {
-        this.loadFactor;
+        this.currentLoad = 0;
+        this.loadFactor = 0.75;
         this.capacity = 16;
 		this.buckets = new Array(this.capacity);
 	}
@@ -16,21 +24,32 @@ class HashMap {
 	}
 	set(key, value) {
 		const index = this.hash(key);
-		// If empty create array to push values into (linked list?)
+		// If empty create head to append (linked list)
 		if (!this.buckets[index]) {
-			this.buckets[index] = [];
-			this.buckets[index].push({key, value});
+            // import head list
+			this.buckets[index] = new LinkedList();
+			this.buckets[index].append({key, value});
+            this.currentLoad++;
 		}
 
 		if (this.buckets[index]) {
-			for (let i = 0; i < this.buckets[index].length; i++) {
-				if (this.buckets[index][i].key === key) {
-					this.buckets[index][i].value = value;
-				} else {
-					this.buckets[index].push({key, value});
-				}
-			}
+            let currentNode = this.head;
+            // append to end
+            while (currentNode != null){
+                if (currentNode.key === key){
+                    currentNode.value === value
+                    return
+                }
+                currentNode = currentNode.next
+            }
+            this.buckets[index].append({key, value});
+            
+
 		}
+        if (this.currentLoad > (this.loadFactor * this.capacity)) {
+            this.capacity = this.capacity * 2;
+            this.buckets.length = this.capacity; 
+        };
 	}
     get(key) {
         const index = this.hash(key);
@@ -89,18 +108,26 @@ class HashMap {
 
 }
 
-const test = new HashMap();
-test.set('apple', 'red');
-test.set('banana', 'yellow');
-test.set('carrot', 'orange');
-console.log(test);
-console.log(test.get('apple'));
-console.log(test.get('potato'));
-console.log(test.has('apple'));
-console.log(test.has('potato'));
-console.log(test.remove('potato'));
-console.log(test.remove('apple'));
-console.log(test.length());
-console.log(test.keys());
-console.log(test.values());
-console.log(test.entries());
+
+// test.set('banana', 'yellow')
+// test.set('carrot', 'orange')
+// test.set('dog', 'brown')
+// test.set('elephant', 'gray')
+// test.set('frog', 'green')
+// test.set('grape', 'purple')
+// test.set('hat', 'black')
+// test.set('ice cream', 'white')
+// test.set('jacket', 'blue')
+// test.set('kite', 'pink')
+// test.set('lion', 'golden')
+// test.set('moon', 'silver')
+// console.log(test.get('apple'));
+// console.log(test.get('potato'));
+// console.log(test.has('apple'));
+// console.log(test.has('potato'));
+// console.log(test.remove('potato'));
+// console.log(test.remove('apple'));
+// console.log(test.length());
+// console.log(test.keys());
+// console.log(test.values());
+// console.log(test.entries());
