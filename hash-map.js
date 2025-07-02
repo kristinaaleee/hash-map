@@ -2,9 +2,6 @@ import { LinkedList } from "../linked-list/linked-list.js";
 
 export { HashMap };
 
-
-// Array.from({ length: capacity }, (v, i) => linked list); to create buckets
-
 class HashMap {
 	constructor() {
         this.currentLoad = 0;
@@ -13,7 +10,7 @@ class HashMap {
 		this.buckets = new Array(this.capacity);
 	}
 
-	hash(key) {
+	_hash(key) {
 		let hashCode = 0;
 		const primeNumber = 31;
 		for (let i = 0; i < key.length; i++) {
@@ -22,65 +19,80 @@ class HashMap {
 
 		return hashCode % this.buckets.length;
 	}
+
+    _resize(){
+        let bucketHolder = this.buckets;
+        this.capacity = this.capacity * 2;
+        this.buckets = new Array (this.capacity)
+        this.currentLoad = 0
+
+        bucketHolder.forEach((bucket) => {
+            let index = 0;
+            while (index < bucket.size()){
+                this.set(bucket.at(index).key, bucket.at(index).value)
+                index++
+            }
+        })
+    }
+
 	set(key, value) {
-		const index = this.hash(key);
-        const currentBucket = this.buckets[index];
+		let index = this._hash(key);
 		// If empty create head to append (linked list)
-		if (!currentBucket) {
+		if (!this.buckets[index]) {
             // import head list
 			this.buckets[index] = new LinkedList();
 			this.buckets[index].append({key, value});
             this.currentLoad++;
-		}
-
-		if (currentBucket) {
-            if (currentBucket.find({key,})){
-                currentBucket.removeAt(currentBucket.find({key,}))
-                
-
+		} else if (this.buckets[index]) {
+            let keyIndex  = this.buckets[index].find(key)
+            if (keyIndex === null){
+                this.buckets[index].append({key, value});
+                this.currentLoad++;
+            } else {
+                this.buckets[index].removeAt(keyIndex)
+                this.buckets[index].insertAt({key, value}, keyIndex) 
             }
-
-		}
+        }
 
         if (this.currentLoad > (this.loadFactor * this.capacity)) {
-            this.capacity = this.capacity * 2;
-            this.buckets.length = this.capacity; 
+            this._resize();
         };
 	}
+
     get(key) {
-        const index = this.hash(key);
+        const index = this._hash(key);
         //Empty bucket
         if (!this.buckets[index]){
             return null;
         }
-        const result = this.buckets[index].filter((element) => element.key === key);
-        if (result[0]) return result[0].value;
+        let keyIndex  = this.buckets[index].find(key)
+        if (keyIndex != null) return this.buckets[index].at(keyIndex).value;
         return null;
     }
     has(key){
-        const index = this.hash(key);
+        const index = this._hash(key);
         if (!this.buckets[index]){
             return false;
         }
-        const result = this.buckets[index].filter((element) => element.key === key);
-        if (result[0]) return true;
+        let keyIndex  = this.buckets[index].find(key)
+        if (keyIndex != null) return true;
         return false;
     }
     remove(key){
-        const index = this.hash(key);
+        const index = this._hash(key);
         if (!this.buckets[index]){
             return false;
         }
-        const result = this.buckets[index].filter((element) => element.key != key);
-        if (result.length < this.buckets[index].length){
-            this.buckets[index] = result;
+        let keyIndex = this.buckets[index].find(key)
+        if (keyIndex != null){
+            this.buckets[index].removeAt(keyIndex)
             return true;
         }
         return false;
     }
     length(){
         let mapLength = 0;
-        this.buckets.forEach((bucket) => mapLength += bucket.length)
+        this.buckets.forEach((bucket) => mapLength += bucket.size())
         return mapLength;
     }
     clear(){
@@ -88,42 +100,35 @@ class HashMap {
     }
     keys(){
         let keyArray = [];
-        this.buckets.forEach((bucket) => bucket.forEach((element) => keyArray.push(element.key)))
+        this.buckets.forEach((bucket) => {
+            let index = 0;
+            while (index < bucket.size()){
+                keyArray.push(bucket.at(index).key)
+                index++
+            }
+        })
         return keyArray;
     }
     values(){
         let valueArray = [];
-        this.buckets.forEach((bucket) => bucket.forEach((element) => valueArray.push(element.value)))
+        this.buckets.forEach((bucket) => {
+            let index = 0;
+            while (index < bucket.size()){
+                valueArray.push(bucket.at(index).value)
+                index++
+            }
+        })
         return valueArray;
     }
     entries(){
         let entriesArray = [];
-        this.buckets.forEach((bucket) => bucket.forEach((element) => entriesArray.push([element.key, element.value])))
+        this.buckets.forEach((bucket) => {
+            let index = 0;
+            while (index < bucket.size()){
+                entriesArray.push([bucket.at(index).key, bucket.at(index).value])
+                index++
+            }
+        })
         return entriesArray;
     }
-
 }
-
-
-// test.set('banana', 'yellow')
-// test.set('carrot', 'orange')
-// test.set('dog', 'brown')
-// test.set('elephant', 'gray')
-// test.set('frog', 'green')
-// test.set('grape', 'purple')
-// test.set('hat', 'black')
-// test.set('ice cream', 'white')
-// test.set('jacket', 'blue')
-// test.set('kite', 'pink')
-// test.set('lion', 'golden')
-// test.set('moon', 'silver')
-// console.log(test.get('apple'));
-// console.log(test.get('potato'));
-// console.log(test.has('apple'));
-// console.log(test.has('potato'));
-// console.log(test.remove('potato'));
-// console.log(test.remove('apple'));
-// console.log(test.length());
-// console.log(test.keys());
-// console.log(test.values());
-// console.log(test.entries());
