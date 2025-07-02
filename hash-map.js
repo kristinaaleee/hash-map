@@ -24,28 +24,24 @@ class HashMap {
 	}
 	set(key, value) {
 		const index = this.hash(key);
+        const currentBucket = this.buckets[index];
 		// If empty create head to append (linked list)
-		if (!this.buckets[index]) {
+		if (!currentBucket) {
             // import head list
 			this.buckets[index] = new LinkedList();
 			this.buckets[index].append({key, value});
             this.currentLoad++;
 		}
 
-		if (this.buckets[index]) {
-            let currentNode = this.head;
-            // append to end
-            while (currentNode != null){
-                if (currentNode.key === key){
-                    currentNode.value === value
-                    return
-                }
-                currentNode = currentNode.next
+		if (currentBucket) {
+            if (currentBucket.find({key,})){
+                currentBucket.removeAt(currentBucket.find({key,}))
+                
+
             }
-            this.buckets[index].append({key, value});
-            
 
 		}
+
         if (this.currentLoad > (this.loadFactor * this.capacity)) {
             this.capacity = this.capacity * 2;
             this.buckets.length = this.capacity; 
