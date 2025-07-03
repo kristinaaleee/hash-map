@@ -35,6 +35,7 @@ class HashMap {
         })
     }
 
+    // Add key value pair to buckets - UNIQUE KEYS
 	set(key, value) {
 		let index = this._hash(key);
 		// If empty create head to append (linked list)
@@ -59,6 +60,7 @@ class HashMap {
         };
 	}
 
+    // Returns value using key to search buckets
     get(key) {
         const index = this._hash(key);
         //Empty bucket
@@ -69,6 +71,8 @@ class HashMap {
         if (keyIndex != null) return this.buckets[index].at(keyIndex).value;
         return null;
     }
+
+    // Checks if key assists in any buckets
     has(key){
         const index = this._hash(key);
         if (!this.buckets[index]){
@@ -78,6 +82,8 @@ class HashMap {
         if (keyIndex != null) return true;
         return false;
     }
+
+    // Remove key value pair using key
     remove(key){
         const index = this._hash(key);
         if (!this.buckets[index]){
@@ -86,18 +92,25 @@ class HashMap {
         let keyIndex = this.buckets[index].find(key)
         if (keyIndex != null){
             this.buckets[index].removeAt(keyIndex)
+            this.currentLoad--;
             return true;
         }
         return false;
     }
+
     length(){
-        let mapLength = 0;
-        this.buckets.forEach((bucket) => mapLength += bucket.size())
-        return mapLength;
+        // let mapLength = 0;
+        // this.buckets.forEach((bucket) => mapLength += bucket.size())
+        // return mapLength;
+        return this.currentLoad;
     }
+
+    // Clears buckets but keeps current capacity
     clear(){
         this.buckets = new Array(this.capacity);
     }
+    
+    // Returns array of keys
     keys(){
         let keyArray = [];
         this.buckets.forEach((bucket) => {
@@ -109,6 +122,8 @@ class HashMap {
         })
         return keyArray;
     }
+
+    // Returns array of values
     values(){
         let valueArray = [];
         this.buckets.forEach((bucket) => {
@@ -120,6 +135,8 @@ class HashMap {
         })
         return valueArray;
     }
+
+    // Returns array of [key, value]
     entries(){
         let entriesArray = [];
         this.buckets.forEach((bucket) => {
